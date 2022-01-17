@@ -38,7 +38,7 @@ def win(board, piece):
                 return True  
     
     # check positively sloped diagenal
-    for c in range(COLUMN_COUNT):
+    for c in range(COLUMN_COUNT-3):
         for r in range(ROW_COUNT-3):
             if board[r][c] == piece and board[r+1][c+1] == piece and board[r+2][c+2] == piece and board[r+3][c+3] == piece:    
                 return True  
