@@ -54,7 +54,7 @@ game_over = False
 turn = 0
 
 while not game_over:
-    os.system('cls' if os.name == 'nt' else 'clear') # Linux users exit too! ;-)
+    os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too! ;-)
     print_board(board)
     # Ask for player one's input
     # If turn == 0 then ask for player one's input 
@@ -87,3 +87,4 @@ while not game_over:
     turn += 1
     turn = turn % 2 # Alternate between zero and one
                     # (Player one and player two's turn respectively)
+
