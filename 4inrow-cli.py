@@ -70,7 +70,6 @@ while not game_over:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print("Player One Wins!")
                 game_over = True
-                break
 
     # Ask for player two's input
     else:
@@ -84,7 +83,6 @@ while not game_over:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print("Player Two Wins!")
                 game_over = True
-                break
 
     turn += 1
     turn = turn % 2 # Alternate between zero and one
