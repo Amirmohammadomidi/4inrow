@@ -59,7 +59,6 @@ def win(board, piece):
                     return True     
 
 def draw_board(board): # draw the board 
-    pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Created the first row here so it wouldn't be black when no input is given
     for c in range(COLUMN_COUNT): 
         for r in range(ROW_COUNT):
             # rect(surface, color, rect, width=0) - r*SQUARESIZE+SQUARESIZE --> shift down by one
@@ -90,8 +89,8 @@ screen = pygame.display.set_mode(size)
 draw_board(board)
 pygame.display.update()
 font = pygame.font.SysFont("Noto Sans Mono", 65)
-
-
+pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Prevents top row from getting black
+                                                           # There should be a better solution for this!
 while not game_over:
     print_board(board)
     os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too! ;-)
@@ -101,7 +100,7 @@ while not game_over:
             sys.exit()
 
         if event.type == pygame.MOUSEMOTION:
-            pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE))
+            pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Clears the first row and make the piece disapear while showing which player won
             posx = event.pos[0]
             if turn == 0:
                 pygame.draw.circle(screen, MAGENTA, (posx, int(SQUARESIZE/2)), RADIUS)
@@ -110,7 +109,7 @@ while not game_over:
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN: # Droping a piece when user press the mouse button
-            pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Clear the first row(rectangle) to make it pretty while showing which player won
+            pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) 
             # Ask for player one's input
             # If turn == 0 then ask for player one's input 
             # Otherwise ask for player two's input
@@ -141,7 +140,7 @@ while not game_over:
                     if win(board, 2):
                         # os.system('cls' if os.name == 'nt' else 'clear')
                         label = font.render("Player Two Wins!", 1, YELLOW)
-                        screen.blit(label, (5,0)) # blit --> update just the given part of the screen
+                        screen.blit(label, (5,0)) # blit --> Update just the given part of the screen
                         print("Player Two Wins!")
                         game_over = True
             
