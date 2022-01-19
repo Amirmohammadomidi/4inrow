@@ -9,8 +9,8 @@ ROW_COUNT = 6
 # Colors used by pygame  
 GREEN = (70,206,105)
 PURPLE = (40,42,54)
-MAGENTA = (206,121,172)
-YELLOW = (241,250,140)
+MAGENTA = (206,121,172) # player one's color
+YELLOW = (241,250,140) # player tow's color
 
 def create_board():
     board = np.zeros((ROW_COUNT,COLUMN_COUNT))
@@ -93,30 +93,30 @@ pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Prevents top row fr
                                                            # There should be a better solution for this!
 while not game_over:
     print_board(board)
-    os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too! ;-)
+    os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too!
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: # Quit when the user press the exit button
             sys.exit()
 
-        if event.type == pygame.MOUSEMOTION:
+        if event.type == pygame.MOUSEMOTION: # Track my mouse movement (used in the top row)
             pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Clears the first row and make the piece disapear while showing which player won
-            posx = event.pos[0]
+            pos = event.pos[0] 
             if turn == 0:
-                pygame.draw.circle(screen, MAGENTA, (posx, int(SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, MAGENTA, (pos, int(SQUARESIZE/2)), RADIUS)
             else: 
-                pygame.draw.circle(screen, YELLOW, (posx, int(SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, YELLOW, (pos, int(SQUARESIZE/2)), RADIUS)
         pygame.display.update()
 
-        if event.type == pygame.MOUSEBUTTONDOWN: # Droping a piece when user press the mouse button
+        if event.type == pygame.MOUSEBUTTONDOWN: # Drop a piece when user press the mouse button
             pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) 
             # Ask for player one's input
             # If turn == 0 then ask for player one's input 
             # Otherwise ask for player two's input
             if turn == 0:
-                posx = event.pos[0]
-                column = int(math.floor(posx/SQUARESIZE))
-
+                pos = event.pos[0] # X is between 0 and 700
+                column = int(math.floor(pos/SQUARESIZE)) # round down the number you get from pos/SQUARESIZE
+                                                         # to determine which column we are in
                 if check_location_validity(board, column):
                     row = get_next_open_row(board, column)
                     piece_drop(board, row, column, 1)
@@ -130,8 +130,8 @@ while not game_over:
 
             # Ask for player two's input
             else:
-                posx = event.pos[0]
-                column = int(math.floor(posx/SQUARESIZE))
+                pos = event.pos[0]
+                column = int(math.floor(pos/SQUARESIZE))
 
                 if check_location_validity(board, column):
                     row = get_next_open_row(board, column)
