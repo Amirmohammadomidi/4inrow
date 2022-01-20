@@ -12,11 +12,10 @@ Here's a simple example demonstrating the game mechanics:
 - GUI implemented using pygame
 - AI implemented using minmax algorithm
 
-## Dependencies
-TO BE COMPLETED
-
+## Dependencie
 ```sh
 pip install pygame
+pip install numpy
 ```
 
 
