@@ -1,5 +1,6 @@
 import math
 
+
 def hiorestic(matris):
     
     def win_modes(matris, piece):
@@ -39,4 +40,3 @@ def hiorestic(matris):
     oponent_win_modes = win_modes(matris , piece=1)
     score = Our_win_modes - oponent_win_modes 
     return score
-

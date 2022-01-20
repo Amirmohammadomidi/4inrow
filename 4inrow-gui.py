@@ -61,8 +61,8 @@ def win(board, piece):
 def draw_board(board): # draw the board 
     for c in range(COLUMN_COUNT): 
         for r in range(ROW_COUNT):
-            # rect(surface, color, rect, width=0) - r*SQUARESIZE+SQUARESIZE --> shift down by one
-            pygame.draw.rect(screen, GREEN, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE)) 
+            # rect(surface, color, rect, width=0) - r*SQUARESIZE+SQUARESIZE --> shift down by one 
+            pygame.draw.rect(screen, GREEN, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE)) # (Width,Height,Y,X)
             # circle(surface, color, center, radius)
             pygame.draw.circle(screen, PURPLE, (int(c*SQUARESIZE+SQUARESIZE/2), int(r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)), RADIUS) # 
     
@@ -79,6 +79,7 @@ game_over = False
 turn = 0
 
 pygame.init()
+pygame.mixer.init() # For sound!
 
 SQUARESIZE = 90
 RADIUS = int(SQUARESIZE/2 - 5) # RADIUS of the circles (-5 so the circles arent touching)
@@ -89,9 +90,12 @@ screen = pygame.display.set_mode(size)
 draw_board(board)
 pygame.display.update()
 font = pygame.font.SysFont("Noto Sans Mono", 65)
-pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Prevents top row from getting black
-                                                           # There should be a better solution for this!
-while not game_over:
+pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Prevents top row from getting black (There should be a better solution for this!)
+# Sound files
+drop_sound = pygame.mixer.Sound("sound/stone-drop.ogg")
+win_sound = pygame.mixer.Sound("sound/tada.ogg")  
+
+while not game_over:                                      
     print_board(board)
     os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too!
 
@@ -109,6 +113,7 @@ while not game_over:
         pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN: # Drop a piece when user press the mouse button
+            drop_sound.play() 
             pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) 
             # Ask for player one's input
             # If turn == 0 then ask for player one's input 
@@ -147,6 +152,7 @@ while not game_over:
             draw_board(board)
 
             if game_over:
+                win_sound.play()
                 pygame.time.wait(5000) # If the game is over wait 5s then exit
 
             turn += 1
