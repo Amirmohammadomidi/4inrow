@@ -136,7 +136,7 @@ def negamax2(board,depth,alpha,beta,color):
             else: # Game is over, no more valid moves
                 return (None , 0)
         else : # depth is 0 
-            return(None ,color*hiorestic(board))
+            return(None ,color*heuristic(board))
 
     value = -math.inf
     column = random.choice(valid_locations)
@@ -182,7 +182,7 @@ def negamax(board,depth,alpha,beta,color):
             break #cut_of
     return column , value
 
-def hiorestic(matris):
+def heuristic(matris):
     
     def win_modes(matris, piece):
         check = [0 , piece]
