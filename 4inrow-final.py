@@ -305,7 +305,6 @@ while not game_over:
                     print_board(board)
                     draw_board(board)
 
-
 	# # Ask for Player 2 Input
     if turn == AI and not game_over:				
 
