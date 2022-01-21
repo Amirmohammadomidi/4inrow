@@ -22,7 +22,6 @@ PURPLE = (40,42,54)
 MAGENTA = (206,121,172) # player one's color
 YELLOW = (241,250,140) # player tow's color
 
-
 def create_board(): 
     board = np.zeros((ROW_COUNT,COLUMN_COUNT),dtype = np.int8)
     return board
@@ -51,7 +50,6 @@ def win(board, piece): #$ winning_move
             if board[r][c] == piece and board[r][c+1] == piece and board[r][c+2] == piece and board[r][c+3] == piece: # draw the main rectangle
                 return True
                
-    
     # check vertically 
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT-3):
@@ -126,6 +124,35 @@ def score_position(board, piece):
 def is_terminal_state(board):
 	return win(board, PLAYER_PIECE) or win(board, AI_PIECE) or len(get_valid_locations(board)) == 0
 
+def negamax2(board,depth,alpha,beta,color):
+    valid_locations = get_valid_locations(board)
+    is_terminal = is_terminal_state(board)
+    if depth == 0 or is_terminal:
+        if is_terminal:
+            if win(board , AI_PIECE) :
+                return (None , 100000000000000)
+            elif win(board , PLAYER_PIECE):
+                return (None,-10000000000000)
+            else: # Game is over, no more valid moves
+                return (None , 0)
+        else : # depth is 0 
+            return(None ,color*hiorestic(board))
+
+    value = -math.inf
+    column = random.choice(valid_locations)
+    for col in valid_locations :
+        row = get_next_open_row(board , col)
+        b_copy = board.copy()
+        piece_drop(b_copy, row,col, AI_PIECE)
+        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color)[1] #without_max
+        if(new_value > value):
+            value = new_value
+            column = col 
+        alpha = max(alpha , value)
+        if(alpha>= beta):
+            break #cut_of
+    return column , value 
+
 def negamax(board,depth,alpha,beta,color):
     valid_locations = get_valid_locations(board)
     is_terminal = is_terminal_state(board)
@@ -154,36 +181,6 @@ def negamax(board,depth,alpha,beta,color):
         if(alpha>= beta):
             break #cut_of
     return column , value
-
-def negamax2(board,depth,alpha,beta,color):
-    valid_locations = get_valid_locations(board)
-    is_terminal = is_terminal_state(board)
-    if depth == 0 or is_terminal:
-        if is_terminal:
-            if win(board , AI_PIECE) :
-                return (None , 100000000000000)
-            elif win(board , PLAYER_PIECE):
-                return (None,-10000000000000)
-            else: # Game is over, no more valid moves
-                return (None , 0)
-        else : # depth is 0 
-            return(None ,color*hiorestic(board))
-            
-    value = -math.inf
-    column = random.choice(valid_locations)
-    for col in valid_locations :
-        row = get_next_open_row(board , col)
-        b_copy = board.copy()
-        piece_drop(b_copy, row,col, AI_PIECE)
-        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color)[1] #without_max
-        if(new_value > value):
-            value = new_value
-            column = col 
-        alpha = max(alpha , value)
-        if(alpha>= beta):
-            break #cut_of
-    return column , value 
-
 
 def hiorestic(matris):
     
@@ -224,96 +221,6 @@ def hiorestic(matris):
     oponent_win_modes = win_modes(matris , piece=1)
     score = Our_win_modes - oponent_win_modes 
     return score
-
-def minimax(board, depth, alpha, beta, maximizingPlayer):
-	valid_locations = get_valid_locations(board)
-	is_terminal = is_terminal_state(board)
-	if depth == 0 or is_terminal:
-		if is_terminal:
-			if win(board, AI_PIECE):
-				return (None, 100000000000000)
-			elif win(board, PLAYER_PIECE):
-				return (None, -10000000000000)
-			else: # Game is over, no more valid moves
-				return (None, 0)
-		else: # Depth is zero
-			return (None, score_position(board, AI_PIECE))
-	if maximizingPlayer:
-		value = -math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			piece_drop(b_copy, row, col, AI_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
-			if new_score > value:
-				value = new_score
-				column = col
-			alpha = max(alpha, value)
-			if alpha >= beta:
-				break
-		return column, value
-
-	else: # Minimizing player
-		value = math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			piece_drop(b_copy, row, col, PLAYER_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
-			if new_score < value:
-				value = new_score
-				column = col
-			beta = min(beta, value)
-			if alpha >= beta:
-				break
-		return column, value
-
-def minimax2(board, depth, alpha, beta, maximizingPlayer): # whith hiorestic
-	valid_locations = get_valid_locations(board)
-	is_terminal = is_terminal_state(board)
-	if depth == 0 or is_terminal:
-		if is_terminal:
-			if win(board, AI_PIECE):
-				return (None, 100000000000000)
-			elif win(board, PLAYER_PIECE):
-				return (None, -10000000000000)
-			else: # Game is over, no more valid moves
-				return (None, 0)
-		else: # Depth is zero
-			return (None, hiorestic(board))
-	if maximizingPlayer:
-		value = -math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			piece_drop(b_copy, row, col, AI_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
-			if new_score > value:
-				value = new_score
-				column = col
-			alpha = max(alpha, value)
-			if alpha >= beta:
-				break
-		return column, value
-
-	else: # Minimizing player
-		value = math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			piece_drop(b_copy, row, col, PLAYER_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
-			if new_score < value:
-				value = new_score
-				column = col
-			beta = min(beta, value)
-			if alpha >= beta:
-				break
-		return column, value
 
 def get_valid_locations(board):
 	valid_locations = []
@@ -422,9 +329,7 @@ while not game_over:
             
             turn += 1
             turn = turn % 2 # Alternate between zero and one
-                            # (Player one and player two's turn respectively)
-
-            
+                            # (Player one and player two's turn respectively)    
     if game_over:
         win_sound.play()
         pygame.time.wait(5000) # If the game is over wait 5s then exit
