@@ -387,8 +387,8 @@ while not game_over:
                     
                     if win(board, PLAYER_PIECE):
                         #os.system('cls' if os.name == 'nt' else 'clear')
-                        label = font.render("Player 1 wins!!", 1, MAGENTA)
-                        screen.blit(label, (40,10))
+                        label = font.render("Player one wins!", 1, MAGENTA)
+                        screen.blit(label, (5,0))
                         print("Player One Wins!")
                         game_over = True
                         
@@ -412,8 +412,8 @@ while not game_over:
             
             if win(board, AI_PIECE):
                 # os.system('cls' if os.name == 'nt' else 'clear')
-                label = font.render("Player 2 wins!!", 1, YELLOW)
-                screen.blit(label, (40,10))
+                label = font.render("Player two wins!", 1, YELLOW)
+                screen.blit(label, (5,0))
                 print("Player Two Wins!")
                 game_over = True
                 
