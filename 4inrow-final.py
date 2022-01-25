@@ -130,11 +130,6 @@ def not_piece(piece):
 def is_terminal_state(board):
 	return win(board, PLAYER_PIECE) or win(board, AI_PIECE) or len(get_valid_locations(board)) == 0
 
-def negamax3(board , depth , alpha , beta , color):
-    if win(board , AI_PIECE) :
-        return()
-
-    
 def negamax2(board,depth,alpha,beta,color,piece):
     valid_locations = get_valid_locations(board)
     is_terminal = is_terminal_state(board)
