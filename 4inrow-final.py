@@ -121,30 +121,41 @@ def score_position(board, piece):
 
 	return score
 
+def not_piece(piece):
+    if piece==AI_PIECE :
+        return PLAYER_PIECE
+    else :
+        return AI_PIECE
+
 def is_terminal_state(board):
 	return win(board, PLAYER_PIECE) or win(board, AI_PIECE) or len(get_valid_locations(board)) == 0
 
-def negamax2(board,depth,alpha,beta,color):
+def negamax3(board , depth , alpha , beta , color):
+    if win(board , AI_PIECE) :
+        return()
+
+    
+def negamax2(board,depth,alpha,beta,color,piece):
     valid_locations = get_valid_locations(board)
     is_terminal = is_terminal_state(board)
     if depth == 0 or is_terminal:
         if is_terminal:
-            if win(board , AI_PIECE) :
+            if win(board , piece) :
                 return (None , 100000000000000)
-            elif win(board , PLAYER_PIECE):
+            elif win(board , not_piece(piece)):
                 return (None,-10000000000000)
             else: # Game is over, no more valid moves
                 return (None , 0)
-        else : # depth is 0 
-            return(None ,color*heuristic(board))
+        #else : # depth is 0 
+        return(None ,color*heuristic(board))
 
     value = -math.inf
     column = random.choice(valid_locations)
     for col in valid_locations :
         row = get_next_open_row(board , col)
         b_copy = board.copy()
-        piece_drop(b_copy, row,col, AI_PIECE)
-        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color)[1] #without_max
+        piece_drop(b_copy, row,col,piece)
+        new_value = -negamax2(b_copy ,depth-1,-beta , -alpha , -color, not_piece(piece))[1] #without_max
         if(new_value > value):
             value = new_value
             column = col 
@@ -153,27 +164,27 @@ def negamax2(board,depth,alpha,beta,color):
             break #cut_of
     return column , value 
 
-def negamax(board,depth,alpha,beta,color):
+def negamax(board,depth,alpha,beta,color,piece):
     valid_locations = get_valid_locations(board)
     is_terminal = is_terminal_state(board)
     if depth == 0 or is_terminal:
         if is_terminal:
-            if win(board , AI_PIECE) :
-                return (None , color*100000000000000)
-            elif win(board , PLAYER_PIECE):
-                return (None,color* -10000000000000)
+            if win(board , piece) :
+                return (None , 100000000000000)
+            elif win(board , not_piece(piece)):
+                return (None, -10000000000000)
             else: # Game is over, no more valid moves
                 return (None , 0)
         else : # depth is 0 
-            return(None ,color* score_position(board,AI_PIECE))
+            return(None ,color* score_position(board,piece))
             
     value = -math.inf
     column = random.choice(valid_locations)
     for col in valid_locations :
         row = get_next_open_row(board , col)
         b_copy = board.copy()
-        piece_drop(b_copy, row,col, AI_PIECE)
-        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color)[1] #without_max
+        piece_drop(b_copy, row,col, piece)
+        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color,not_piece(piece))[1] #without_max
         if(new_value > value):
             value = new_value
             column = col 
@@ -222,7 +233,7 @@ def heuristic(matris):
     score = Our_win_modes - oponent_win_modes 
     return score
 
-def get_valid_locations(board):
+def get_valid_locations(board): #true
 	valid_locations = []
 	for col in range(COLUMN_COUNT):
 		if check_location_validity(board, col):
@@ -264,7 +275,7 @@ pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE)) # Prevents top row fr
 # Sound files
 drop_sound = pygame.mixer.Sound("sound/stone-drop.ogg")
 win_sound = pygame.mixer.Sound("sound/tada.ogg")  
-turn = random.randint(PLAYER,AI)
+turn = PLAYER #random.randint(PLAYER,AI)
 
 while not game_over:
     os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too!
@@ -310,7 +321,7 @@ while not game_over:
 
 		#col = random.randint(0, COLUMN_COUNT-1)
 		#col = pick_best_move(board, AI_PIECE)
-        col, minimax_score = negamax2(board, 5, -math.inf, math.inf, 1) #negamax / minimax
+        col, minimax_score = negamax2(board, 5, -math.inf, math.inf, -1, AI_PIECE) #negamax / minimax
         if check_location_validity(board, col):
 			#pygame.time.wait(500)
             row = get_next_open_row(board, col)
