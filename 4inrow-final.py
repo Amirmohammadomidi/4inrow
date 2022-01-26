@@ -1,3 +1,8 @@
+# █▀▀ █▀█ █▀▀ █▀▄ █ ▀█▀ █▀ 
+# █▄▄ █▀▄ ██▄ █▄▀ █ ░█░ ▄█ 
+# Amir Mohammadkhah - Heuristic
+# Amirmohammad Omidi - Game Mechanics - GUI
+# Hossein - Negamax
 import numpy as np
 import random
 import pygame
@@ -15,7 +20,6 @@ EMPTY = 0
 PLAYER_PIECE = 1
 AI_PIECE = 2
 
-WINDOW_LENGTH = 4
 # Colors used by pygame  
 GREEN = (70,206,105)
 PURPLE = (40,42,54)
@@ -68,59 +72,6 @@ def win(board, piece): #$ winning_move
                 if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece and board[r-3][c+3] == piece:    
                     return True     
 
-def window_evaluate(window, piece):
-	score = 0
-	opp_piece = PLAYER_PIECE
-	if piece == PLAYER_PIECE:
-		opp_piece = AI_PIECE
-
-	if window.count(piece) == 4:
-		score += 100
-	elif window.count(piece) == 3 and window.count(EMPTY) == 1:
-		score += 5
-	elif window.count(piece) == 2 and window.count(EMPTY) == 2:
-		score += 2
-
-	if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
-		score -= 4
-
-	return score
-
-def score_position(board, piece):
-	score = 0
-
-	## Score center column
-	center_array = [int(i) for i in list(board[:, COLUMN_COUNT//2])]
-	center_count = center_array.count(piece)
-	score += center_count * 3
-
-	## Score Horizontal
-	for r in range(ROW_COUNT):
-		row_array = [int(i) for i in list(board[r,:])]
-		for c in range(COLUMN_COUNT-3):
-			window = row_array[c:c+WINDOW_LENGTH]
-			score += window_evaluate(window, piece)
-
-	## Score Vertical
-	for c in range(COLUMN_COUNT):
-		col_array = [int(i) for i in list(board[:,c])]
-		for r in range(ROW_COUNT-3):
-			window = col_array[r:r+WINDOW_LENGTH]
-			score += window_evaluate(window, piece)
-
-	## Score posiive sloped diagonal
-	for r in range(ROW_COUNT-3):
-		for c in range(COLUMN_COUNT-3):
-			window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
-			score += window_evaluate(window, piece)
-
-	for r in range(ROW_COUNT-3):
-		for c in range(COLUMN_COUNT-3):
-			window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
-			score += window_evaluate(window, piece)
-
-	return score
-
 def not_piece(piece):
     if piece==AI_PIECE :
         return PLAYER_PIECE
@@ -130,27 +81,28 @@ def not_piece(piece):
 def is_terminal_state(board):
 	return win(board, PLAYER_PIECE) or win(board, AI_PIECE) or len(get_valid_locations(board)) == 0
 
-def negamax2(board,depth,alpha,beta,color,piece):
-    valid_locations = get_valid_locations(board)
+def negamax(board,depth,alpha,beta,color,piece):
+    
     is_terminal = is_terminal_state(board)
     if depth == 0 or is_terminal:
         if is_terminal:
             if win(board , piece) :
-                return (None , 100000000000000)
+                return (None , math.inf)
             elif win(board , not_piece(piece)):
-                return (None,-10000000000000)
+                return (None,-math.inf)
             else: # Game is over, no more valid moves
                 return (None , 0)
         #else : # depth is 0 
         return(None ,color*heuristic(board))
 
     value = -math.inf
+    valid_locations = get_valid_locations(board)
     column = random.choice(valid_locations)
     for col in valid_locations :
         row = get_next_open_row(board , col)
         b_copy = board.copy()
         piece_drop(b_copy, row,col,piece)
-        new_value = -negamax2(b_copy ,depth-1,-beta , -alpha , -color, not_piece(piece))[1] #without_max
+        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color, not_piece(piece))[1] #without_max
         if(new_value > value):
             value = new_value
             column = col 
@@ -158,35 +110,6 @@ def negamax2(board,depth,alpha,beta,color,piece):
         if(alpha>= beta):
             break #cut_of
     return column , value 
-
-def negamax(board,depth,alpha,beta,color,piece):
-    valid_locations = get_valid_locations(board)
-    is_terminal = is_terminal_state(board)
-    if depth == 0 or is_terminal:
-        if is_terminal:
-            if win(board , piece) :
-                return (None , 100000000000000)
-            elif win(board , not_piece(piece)):
-                return (None, -10000000000000)
-            else: # Game is over, no more valid moves
-                return (None , 0)
-        else : # depth is 0 
-            return(None ,color* score_position(board,piece))
-            
-    value = -math.inf
-    column = random.choice(valid_locations)
-    for col in valid_locations :
-        row = get_next_open_row(board , col)
-        b_copy = board.copy()
-        piece_drop(b_copy, row,col, piece)
-        new_value = -negamax(b_copy ,depth-1,-beta , -alpha , -color,not_piece(piece))[1] #without_max
-        if(new_value > value):
-            value = new_value
-            column = col 
-        alpha = max(alpha , value)
-        if(alpha>= beta):
-            break #cut_of
-    return column , value
 
 def heuristic(matris):
     
@@ -218,13 +141,13 @@ def heuristic(matris):
                         new_way = new_way + 1    
         return new_way
 
-    if win(matris , piece=2):
+    if win(matris , AI_PIECE):
         return math.inf
-    elif win(matris , piece=1):
+    elif win(matris , PLAYER_PIECE):
         return -math.inf
 
-    Our_win_modes = win_modes(matris , piece=2)
-    oponent_win_modes = win_modes(matris , piece=1)
+    Our_win_modes = win_modes(matris , AI_PIECE)
+    oponent_win_modes = win_modes(matris , PLAYER_PIECE)
     score = Our_win_modes - oponent_win_modes 
     return score
 
@@ -258,7 +181,7 @@ pygame.init()
 pygame.mixer.init() # For sound!
 
 SQUARESIZE = 90
-RADIUS = int(SQUARESIZE/2 - 5) # RADIUS of the circles (-5 so the circles arent touching)
+RADIUS = int(SQUARESIZE/2 - 5) # RADIUS of the circles (-5 so that the circles arent touching)
 height = (ROW_COUNT+1) * SQUARESIZE
 width = COLUMN_COUNT * SQUARESIZE
 size = (width, height)
@@ -273,15 +196,15 @@ win_sound = pygame.mixer.Sound("sound/tada.ogg")
 turn = PLAYER #random.randint(PLAYER,AI)
 
 while not game_over:
-    os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too!
+    # os.system('cls' if os.name == 'nt' else 'clear') # Linux users exist too!
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.MOUSEMOTION:
             pygame.draw.rect(screen, PURPLE, (0,0, width, SQUARESIZE))
-            posx = event.pos[0]
+            pos = event.pos[0] 
             if turn == PLAYER:
-                pygame.draw.circle(screen, MAGENTA, (posx, int(SQUARESIZE/2)), RADIUS)
+                pygame.draw.circle(screen, MAGENTA, (pos, int(SQUARESIZE/2)), RADIUS)
                 
         pygame.display.update()
         
@@ -291,9 +214,9 @@ while not game_over:
 			#print(event.pos)
 			# Ask for Player 1 Input
             if turn == PLAYER:
-                posx = event.pos[0]
-                col = int(math.floor(posx/SQUARESIZE))
-                
+                pos = event.pos[0] # To track our mouse movement
+                col = int(math.floor(pos/SQUARESIZE)) # round down the number you get from pos/SQUARESIZE
+                                                      # to determine which column we are in
                 if check_location_validity(board, col):
                     row = get_next_open_row(board, col)
                     piece_drop(board, row, col, PLAYER_PIECE)
@@ -301,7 +224,7 @@ while not game_over:
                     if win(board, PLAYER_PIECE):
                         #os.system('cls' if os.name == 'nt' else 'clear')
                         label = font.render("Player one wins!", 1, MAGENTA)
-                        screen.blit(label, (5,0))
+                        screen.blit(label, (5,0)) # Blit --> Just updates a certain part of the screen (based on x, y position)
                         print("Player One Wins!")
                         game_over = True
                         
@@ -316,16 +239,16 @@ while not game_over:
 
 		#col = random.randint(0, COLUMN_COUNT-1)
 		#col = pick_best_move(board, AI_PIECE)
-        col, minimax_score = negamax2(board, 5, -math.inf, math.inf, -1, AI_PIECE) #negamax / minimax
+        col, minimax_score = negamax(board, 4, -math.inf, math.inf, 1, AI_PIECE) #negamax / minimax
         if check_location_validity(board, col):
-			#pygame.time.wait(500)
             row = get_next_open_row(board, col)
+            drop_sound.play()
             piece_drop(board, row, col, AI_PIECE)
             
             if win(board, AI_PIECE):
                 # os.system('cls' if os.name == 'nt' else 'clear')
                 label = font.render("Player two wins!", 1, YELLOW)
-                screen.blit(label, (5,0))
+                screen.blit(label, (5,0)) 
                 print("Player Two Wins!")
                 game_over = True
                 
