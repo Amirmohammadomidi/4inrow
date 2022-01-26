@@ -35,7 +35,7 @@ def print_board(board): #$ Fixes the board orientation and prints the board
 
 def check_location_validity(board, column): #$ is_valid_location 
     return board[ROW_COUNT-1][column] == 0 # Checks if the top row of the respective column is equal to 0 or not
-                                 # if it is then we are allowed to drop a piece there
+                                           # if it is then we are allowed to drop a piece there
 
 def piece_drop(board, row, column, piece): #$ drop_piece
     board[row][column] = piece
