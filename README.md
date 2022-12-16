@@ -10,7 +10,7 @@ Here's a simple example demonstrating the game mechanics:
 
 ## Features
 - GUI implemented using pygame
-- AI implemented using minmax algorithm
+- AI implemented using negamax algorithm
 
 ## Dependencie
 ```sh
